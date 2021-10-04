@@ -3,7 +3,7 @@ library(tidyverse)
 library(tidytext) #for text tidying
 #library(ggthemr) la paletas no sirve xd https://github.com/Mikata-Project/ggthemr
 #library(ggCyberPunk) #pa los graficos electricos medio guachafos https://github.com/delabj/ggCyberPunk
-library(magick) #pa cargar imagenes https://themockup.blog/posts/2019-01-09-add-a-logo-to-your-plot/
+#library(magick) #pa cargar imagenes https://themockup.blog/posts/2019-01-09-add-a-logo-to-your-plot/
 
 
 #################################################################################################################
@@ -330,7 +330,8 @@ ph_df = ph_df %>%
 ## Unir todos en una sola base ----
 
 word_count_MC = 
-  bind_rows(HM_df,BO_df,ttool_df,cbt_df,BGRZ_df,petz_df,yn_df,sic_df,ph_df)
+  bind_rows(HM_df,BO_df,ttool_df,cbt_df,BGRZ_df,petz_df,yn_df,sic_df,ph_df) %>% 
+  drop_na()
 
 ## Guardando el contador de palabras ----
 
@@ -460,36 +461,10 @@ ph_sentimiento =   ph_df %>%
 ################JOIN LOS ALBUNES SENTIMIENTO EN UNO SOLO #################
 
 sentiment_MC = 
-  bind_rows(HM_sentimento, bo_sentimiento, ttool_sentimiento,cbt_sentimiento,BGRZ_sentimiento,yn_sentimiento,sic_sentimiento,ph_sentimiento)
+  bind_rows(HM_sentimento, bo_sentimiento, ttool_sentimiento,cbt_sentimiento,BGRZ_sentimiento,yn_sentimiento,sic_sentimiento,ph_sentimiento) %>% 
+  drop_na()
 
 ################ guardando dataset analisis de sentimiento --------------
 write.csv(sentiment_MC,"sentiment_MC.csv")
 
-######################### PLOT ALBUM COMPLETO COMPRATIVO ################################### no hare #####
-
-MC_alb%>%
-  filter(album %in% c("Bangerz", "Breakout"))%>%
-  ggplot(aes(reorder(track_title, sentiment), sentiment, fill = album)) +
-  geom_col(show.legend = FALSE) +
-  facet_wrap(~album, scales = "free")+
-  labs(x = NULL,
-       y = "Sentiment",
-       title = "Bangerz & Breakout by MC Sentimental Analysis - p1",
-       caption = "                  by: Anamumaq")+
-  geom_text(aes(label = sentiment), 
-             hjust = 1.2,vjust = 0.3, color = "black", 
-             size = 3)+
-  theme_minimal()+
-  
-#     theme(plot.title = element_text(size = 13, hjust = 0.4, face = "bold"),
-#      axis.title.y = element_text(hjust = 0.05, size = 7, color = "grey40", angle = 0),
-#        axis.title.x =  element_text(size = 8, color = "grey40"),
-#        axis.text.x = element_text(size = 6.5, color = "grey40"),
-#        axis.text.y = element_text(size = 6.5, color = "grey40"), 
-#        strip.text = element_text(size = 9, color = "grey40", face = "bold"),
-#       plot.caption = element_text(size = 7.5, color = "grey40"))+
-  coord_flip()
-       #ggsave("Bangerz & Breakout by MC Sentimental Analysis - p1", width = 10, height = 5.5)
-
-
-
+######################### PLOT ALBUM COMPLETO COMPRATIVO ################################### NO SE DESARRLLA-----
