@@ -7,8 +7,9 @@ library(magick) #pa cargar imagenes https://themockup.blog/posts/2019-01-09-add-
 
 
 #################################################################################################################
-
-################################# Extayendo canciones ########################
+##CODIGO SOLO PARA EXTRAER LETRAS DE CANCIONES Y HACER ANALISIS DE SENTIMIENTO###################################
+#################################################################################################################
+################################# Extrae canciones ########################
 # albunes
 # 9. Plastic hearts 2020
 # 8. She is coming 2019 
@@ -22,7 +23,7 @@ library(magick) #pa cargar imagenes https://themockup.blog/posts/2019-01-09-add-
 # 1. Hannah Montana 2: Meet Miley Cyrus 2007
 
 ############################ corriendo ####################
-album_miley = "Plastic hearts"
+album_miley = "Hannah Montana 2: Meet Miley Cyrus"
 t = genius_album(artist = "Miley Cyrus", album = album_miley)
 
 unique(t$track_title)
@@ -30,20 +31,19 @@ unique(t$track_title)
 pend = filter(t, is.na(line)) # obtengo las canciones que no tienen letras
 
 pend_song =  genius_tracklist(artist = "Miley Cyrus", album = album_miley)%>% 
-  filter(track_title %in% pend$track_title) # obtengo url de las canciones sin letras
+              filter(track_title %in% pend$track_title) # obtengo url de las canciones sin letras
 # obtengo las letras de las canciones que faltaban uno a uno
 a_1 = genius_url(pend_song$track_url[1], info = "all")#
 a_2 = genius_url(pend_song$track_url[2], info = "all")#
 a_3 = genius_url(pend_song$track_url[3], info = "all")#
 a_4 = genius_url(pend_song$track_url[4], info = "all")#
-a_5 = genius_url(pend_song$track_url[5], info = "all")#
-a_6 = genius_url(pend_song$track_url[6], info = "all")#
-a_7 = genius_url(pend_song$track_url[7], info = "all")#
-a_8 = genius_url(pend_song$track_url[8], info = "all")#
-a_9 = genius_url(pend_song$track_url[9], info = "all")#
-
-a_10 = genius_url(pend_song$track_url[10], info = "all")
-a_11 = genius_url(pend_song$track_url[11], info = "all")
+#a_5 = genius_url(pend_song$track_url[5], info = "all")#
+#a_6 = genius_url(pend_song$track_url[6], info = "all")#
+#a_7 = genius_url(pend_song$track_url[7], info = "all")#
+#a_8 = genius_url(pend_song$track_url[8], info = "all")#
+#a_9 = genius_url(pend_song$track_url[9], info = "all")#
+#a_10 = genius_url(pend_song$track_url[10], info = "all")
+#a_11 = genius_url(pend_song$track_url[11], info = "all")
 
 # uno los data sets en un solo llamado como el albun
 
@@ -53,15 +53,16 @@ HM = bind_rows(t[c("track_title", "lyric")],
                  a_1[c("track_title", "lyric")],
                  a_2[c("track_title", "lyric")],
                  a_3[c("track_title", "lyric")],
-                 a_4[c("track_title", "lyric")],
-                 a_5[c("track_title", "lyric")],
-                 a_6[c("track_title", "lyric")],
+                 a_4[c("track_title", "lyric")]
+                 #a_5[c("track_title", "lyric")],
+                 #a_6[c("track_title", "lyric")],
                  #              a2_7[c("track_title", "lyric")]
                  #              ,a2_8[c("track_title", "lyric")]
 )%>%
   mutate(album = album_miley) #se han quedado celdas vacias pero no es que falte la letra de la cancion
 
 summary(is.na(HM))
+
 HM%>% filter(is.na(HM$lyric)==TRUE)
 
 #################### 1.5: Meet Miley Cyrus 2007###############
@@ -79,6 +80,7 @@ MMC = bind_rows(t[c("track_title", "lyric")],
   mutate(album = album_miley)
 
 summary(is.na(MMC))
+
 MMC%>% filter(is.na(MMC$lyric)==TRUE)
 
 
@@ -116,6 +118,7 @@ ttool = bind_rows(t[c("track_title", "lyric")],
 
 summary(is.na(ttool))
 ttool%>% filter(is.na(ttool$lyric)==TRUE)
+
 #################### 4. Can't be tamed 2010###################
 cbt = bind_rows(t[c("track_title", "lyric")], 
                   a_1[c("track_title", "lyric")],
@@ -194,6 +197,9 @@ sic = bind_rows(t[c("track_title", "lyric")],
 )%>%
   mutate(album = album_miley)
 
+summary(is.na(sic))
+
+sic%>% filter(is.na(sic$lyric)==TRUE)
 
 ###############  9. Plastic hearts 2020 ############## 
 ph = bind_rows(t[c("track_title", "lyric")], 
@@ -217,70 +223,120 @@ ph%>% filter(is.na(ph$lyric)==TRUE)
 HM_df = HM %>%
   unnest_tokens(word, lyric)
 
+MMC_df = MMC %>%
+  unnest_tokens(word, lyric)
+
 BO_df = BO %>%
   unnest_tokens(word, lyric) #paso Lyric palabra por palabra a la nueva columna word
 
-
-TM_df = tm %>%
+ttool_df = ttool %>%
   unnest_tokens(word, lyric)
 
-CNT_df = cant %>% ### arreglar
+cbt_df = cbt %>%
   unnest_tokens(word, lyric)
 
 BGRZ_df = bgrz %>%
   unnest_tokens(word, lyric)
 
+petz_df = petz %>%
+  unnest_tokens(word, lyric)
+
+yn_df = yn %>%
+  unnest_tokens(word, lyric)
+
+sic_df = sic %>%
+  unnest_tokens(word, lyric)
+
+ph_df = ph %>%
+  unnest_tokens(word, lyric)
 #########################quito la lista de stopwords a las canciones###################
-
-
 mis_stopwords = c("1", "4", "3", "6", "9","a.m", "yeah","da","sha","la",
                   "u.s.a","24","ya","yep","li","dnadon't","sh","hey", "3d",
                   "ay", "b.i.g","bangerz","yup","yell","ya'l","woo","whoa",
-                  "what'd","uh", "uhm")
+                  "what'd","uh", "uhm","til","bff","ahh","i'ma", "ooh","na","ah","15","aw","7am","8am's","7",
+                  "pum","16th","500","ayy","ali","that'll","1916","1969","aah","'s","chi","tai","ups","st","karen",
+                  "mu'fucker","em","goo","hmm","y'all","yah","mmm","hm","whoo")
 
+#1 .Hannah Montana
 HM_df = HM_df %>%
   anti_join(stop_words)%>%
-  filter(!word %in% mis_stopwords)
+  filter(!word %in% mis_stopwords)%>%
+  group_by(album, track_title,word)%>% 
+  summarise(n = n())
 
+## 1.5: Meet Miley Cyrus ##3 no cuent
+
+#2. Breakout
 
 BO_df = BO_df %>%
   anti_join(stop_words) %>%
-  filter(!word %in% mis_stopwords)
+  filter(!word %in% mis_stopwords) %>%
+  group_by(album, track_title,word)%>% 
+  summarise(n = n())
 
-TM_df = TM_df %>%
+#3. The time of our lives
+ttool_df = ttool_df %>%
   anti_join(stop_words) %>%
-  filter(!word %in% mis_stopwords)
+  filter(!word %in% mis_stopwords)%>%
+  group_by(album, track_title,word)%>% 
+  summarise(n = n())
 
-CNT_df = CNT_df %>%
+# 4. Can't be tamed
+cbt_df = cbt_df %>%
   anti_join(stop_words) %>%
-  filter(!word %in% mis_stopwords)
+  filter(!word %in% mis_stopwords)%>%
 
+  group_by(album, track_title,word)%>% 
+  summarise(n = n())
 
+# 5. Bangerz
 BGRZ_df = BGRZ_df %>%
   anti_join(stop_words) %>%
-  filter(!word %in% mis_stopwords)
+  filter(!word %in% mis_stopwords)%>%
+  group_by(album, track_title,word)%>% 
+  summarise(n = n())
 
+# 6. Miley Cyrus and her dead Petz
 
+petz_df = petz_df %>%
+  anti_join(stop_words) %>%
+  filter(!word %in% mis_stopwords)%>%
+  group_by(album, track_title,word)%>% 
+  summarise(n = n())
 
-###################contamos la frecuencia de palabras que encontramos###############
-HM_df %>%
-  count(word, sort = TRUE)
+# 7. Younger now 
+yn_df = yn_df %>%
+  anti_join(stop_words) %>%
+  filter(!word %in% mis_stopwords)%>%
+  group_by(album, track_title,word)%>% 
+  summarise(n = n())
 
-BO_df %>%
-  count(word, sort = TRUE)
+# 8. She is coming
 
-TM_df %>%
-  count(word, sort = TRUE)
+sic_df = sic_df %>%
+  anti_join(stop_words) %>%
+  filter(!word %in% mis_stopwords)%>%
+  group_by(album, track_title,word)%>% 
+  summarise(n = n())
 
-CNT_df %>%
-  count(word, sort = TRUE)
+#  9. Plastic hearts
 
-BGRZ_df %>%
-  count(word, sort = TRUE)
+ph_df = ph_df %>%
+  anti_join(stop_words) %>%
+  filter(!word %in% mis_stopwords)%>%
+  group_by(album, track_title,word)%>% 
+  summarise(n = n())
 
+## Unir todos en una sola base ----
 
+word_count_MC = 
+  bind_rows(HM_df,BO_df,ttool_df,cbt_df,BGRZ_df,petz_df,yn_df,sic_df,ph_df)
 
-# graficos de barras para contar la frecuencia de palabras ##pruebas
+## Guardando el contador de palabras ----
+
+write.csv(word_count_MC,"word_count_MC.csv")
+
+#### graficos de barras para contar la frecuencia de palabras ##pruebas----
 
 HM_df %>%
   count(word, sort = TRUE)%>% 
@@ -352,13 +408,13 @@ bo_sentimiento =   BO_df %>%
   spread(sentiment, n, fill = 0) %>%
   mutate(sentiment = positive - negative)
 
-TM_sentimiento =   TM_df %>%
+ttool_sentimiento =   ttool_df %>%
   inner_join(get_sentiments("bing"))%>% 
   count(album, track_title, sentiment) %>%
   spread(sentiment, n, fill = 0) %>%
   mutate(sentiment = positive - negative)
 
-CNT_sentimiento =   CNT_df %>%
+cbt_sentimiento =   cbt_df %>%
   inner_join(get_sentiments("bing"))%>% 
   count(album, track_title, sentiment) %>%
   spread(sentiment, n, fill = 0) %>%
@@ -370,11 +426,46 @@ BGRZ_sentimiento =   BGRZ_df %>%
   spread(sentiment, n, fill = 0) %>%
   mutate(sentiment = positive - negative)
 
-################JOIN LOS ALBUNES EN UNO SOLO #################
 
-MC_alb = bind_rows(BGRZ_sentimiento, CNT_sentimiento, TM_sentimiento, bo_sentimiento,HM_sentimento)
+petz_sentimiento =   petz_df %>%
+  inner_join(get_sentiments("bing"))%>% 
+  count(album, track_title, sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative)
 
-######################### PLOT ALBUM COMPLETO COMPRATIVO ###################################
+
+yn_sentimiento =   yn_df %>%
+  inner_join(get_sentiments("bing"))%>% 
+  count(album, track_title, sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative)
+
+
+
+sic_sentimiento =   sic_df %>%
+  inner_join(get_sentiments("bing"))%>% 
+  count(album, track_title, sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative)
+
+
+
+ph_sentimiento =   ph_df %>%
+  inner_join(get_sentiments("bing"))%>% 
+  count(album, track_title, sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative)
+
+
+################JOIN LOS ALBUNES SENTIMIENTO EN UNO SOLO #################
+
+sentiment_MC = 
+  bind_rows(HM_sentimento, bo_sentimiento, ttool_sentimiento,cbt_sentimiento,BGRZ_sentimiento,yn_sentimiento,sic_sentimiento,ph_sentimiento)
+
+################ guardando dataset analisis de sentimiento --------------
+write.csv(sentiment_MC,"sentiment_MC.csv")
+
+######################### PLOT ALBUM COMPLETO COMPRATIVO ################################### no hare #####
 
 MC_alb%>%
   filter(album %in% c("Bangerz", "Breakout"))%>%
@@ -401,6 +492,4 @@ MC_alb%>%
        #ggsave("Bangerz & Breakout by MC Sentimental Analysis - p1", width = 10, height = 5.5)
 
 
-### comprobando otras canciones en español ##########
-#  erreway_1 = genius_tracklist(artist = "Erreway", album = "Senales")
-#  RBD = genius_tracklist(artist = "RBD", album = "Rebelde")
+
